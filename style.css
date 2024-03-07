@@ -5,7 +5,7 @@
 }
 .field {
   display: grid;
-  gap: 0.1vw;
+  gap: 5px;
   width: 25vw;
   height: 25vh;
   max-width: 25vw;
