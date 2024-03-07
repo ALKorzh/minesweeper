@@ -130,5 +130,14 @@ cells.forEach((element, index) => {
     }
     visited[x][y] = true
     console.log(visited)
+
+    element.style.backgroundColor = "rgb(82, 80, 80)"
+    for (let i = 0; i < visited.length; i++) {
+      for (let j = 0; j < visited[i].length; j++) {
+        if (visited[i][j] == true) {
+          cells[i * FIELD_SIZE + j].style.backgroundColor = "rgb(82, 80, 80)"
+        }
+      }
+    }
   })
 })
