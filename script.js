@@ -71,31 +71,31 @@ function initializeVisited(FIELD_SIZE) {
   return visited
 }
 
-// function openZeros(matrix, x, y, visited) {
-//   let dx = [-1, 0, 1, -1, 1, -1, 0, 1]
-//   let dy = [-1, -1, -1, 0, 0, 1, 1, 1]
+function openZeros(matrix, x, y, visited) {
+  let dx = [-1, 0, 1, -1, 1, -1, 0, 1]
+  let dy = [-1, -1, -1, 0, 0, 1, 1, 1]
 
-//   visited[x][y] = true
+  visited[x][y] = true
 
-//   for (let i = 0; i < 8; i++) {
-//     let nx = x + dx[i]
-//     let ny = y + dy[i]
+  for (let i = 0; i < 8; i++) {
+    let nx = x + dx[i]
+    let ny = y + dy[i]
 
-//     if (
-//       nx >= 0 &&
-//       nx < matrix.length &&
-//       ny >= 0 &&
-//       ny < matrix[0].length &&
-//       !visited[nx][ny]
-//     ) {
-//       if (matrix[nx][ny] === 0) {
-//         openZeros(matrix, nx, ny, visited)
-//       }
-//     }
-//   }
-// }
+    if (
+      nx >= 0 &&
+      nx < matrix.length &&
+      ny >= 0 &&
+      ny < matrix[0].length &&
+      !visited[nx][ny]
+    ) {
+      if (matrix[nx][ny] === 0) {
+        openZeros(matrix, nx, ny, visited)
+      }
+    }
+  }
+}
 
-// function openCell() {}
+function openCell() {}
 
 function giveRandomNumber(endPosition) {
   return Math.floor(Math.random() * endPosition)
@@ -118,11 +118,16 @@ function render(FIELD_SIZE) {
 render(FIELD_SIZE)
 
 let visited = initializeVisited(FIELD_SIZE)
+let gameMatrix = createGameMatrix(matrix, FIELD_SIZE)
+console.log(gameMatrix)
 const cells = document.querySelectorAll(".cell")
 cells.forEach((element, index) => {
   element.addEventListener("click", () => {
     let x = Math.floor(index / FIELD_SIZE)
     let y = index % FIELD_SIZE
+    if (gameMatrix[x][y] === 0 && !visited[x][y]) {
+      openZeros(gameMatrix, x, y, visited)
+    }
     visited[x][y] = true
     console.log(visited)
   })
