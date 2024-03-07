@@ -1,4 +1,4 @@
-const FIELD_SIZE = +document.querySelector(".input-size")
+const FIELD_SIZE = 6
 const restart = document.querySelector(".restart-button")
 const start = document.querySelector(".start-button")
 const field = document.querySelector(".field")
@@ -22,7 +22,6 @@ function addBombsToMatrix(FIELD_SIZE) {
   const bombPositionsArr = Array.from(bombPositionsSet).toSorted((a, b) => {
     return a - b
   })
-  console.log(bombPositionsArr)
 
   for (let i = 0; i < FIELD_SIZE; i++) {
     for (let j = 0; j < FIELD_SIZE; j++) {
@@ -65,6 +64,39 @@ function createGameMatrix(matrix, FIELD_SIZE) {
   return gameMatrix
 }
 
+function initializeVisited(FIELD_SIZE) {
+  let visited = Array.from({ length: FIELD_SIZE }, () =>
+    Array(FIELD_SIZE).fill(false)
+  )
+  return visited
+}
+
+// function openZeros(matrix, x, y, visited) {
+//   let dx = [-1, 0, 1, -1, 1, -1, 0, 1]
+//   let dy = [-1, -1, -1, 0, 0, 1, 1, 1]
+
+//   visited[x][y] = true
+
+//   for (let i = 0; i < 8; i++) {
+//     let nx = x + dx[i]
+//     let ny = y + dy[i]
+
+//     if (
+//       nx >= 0 &&
+//       nx < matrix.length &&
+//       ny >= 0 &&
+//       ny < matrix[0].length &&
+//       !visited[nx][ny]
+//     ) {
+//       if (matrix[nx][ny] === 0) {
+//         openZeros(matrix, nx, ny, visited)
+//       }
+//     }
+//   }
+// }
+
+// function openCell() {}
+
 function giveRandomNumber(endPosition) {
   return Math.floor(Math.random() * endPosition)
 }
@@ -77,10 +109,21 @@ function render(FIELD_SIZE) {
     field.innerHTML += `<div class='cell'></div>`
   }
   field.style.gridTemplateColumns = `repeat(${FIELD_SIZE}, 1fr)`
-  const cell = document.querySelectorAll(".cell").forEach((cell) => {
-    cell.addEventListener("click", updateCell)
 
+  document.querySelectorAll(".cell").forEach((cell) => {
     cell.style.width = `calc(1.2*((25vw - (${FIELD_SIZE} + 1)*1vw) / ${FIELD_SIZE}))`
     cell.style.height = `calc(1.2*((25vw - (${FIELD_SIZE} + 1)*1vw) / ${FIELD_SIZE}))`
   })
 }
+render(FIELD_SIZE)
+
+let visited = initializeVisited(FIELD_SIZE)
+const cells = document.querySelectorAll(".cell")
+cells.forEach((element, index) => {
+  element.addEventListener("click", () => {
+    let x = Math.floor(index / FIELD_SIZE)
+    let y = index % FIELD_SIZE
+    visited[x][y] = true
+    console.log(visited)
+  })
+})
