@@ -169,6 +169,8 @@ cells.forEach((element, index) => {
             for (let k = 0; k < FIELD_SIZE; k++) {
               if (gameMatrix[l][k] == -1) {
                 cells[l * FIELD_SIZE + k].innerHTML = "<p>&#128163;</p>"
+                cells[l * FIELD_SIZE + k].style.backgroundColor =
+                  "rgb(82, 80, 80)"
               }
             }
           }
