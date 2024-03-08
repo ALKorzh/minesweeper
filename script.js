@@ -1,7 +1,6 @@
-const FIELD_SIZE = 3
-const restart = document.querySelector(".restart-button")
-const start = document.querySelector(".start-button")
+const set = document.querySelector(".set-field-button")
 const field = document.querySelector(".field")
+const input = document.querySelector(".input-size")
 const colorsOfNum = [
   "blue",
   "green",
@@ -15,45 +14,48 @@ const colorsOfNum = [
 
 let matrix = []
 let flagsCount = 0
-const NUMBER_OF_BOMBS = Math.round(FIELD_SIZE ** 2 / 4)
+let fieldSize
+let NUMBER_OF_BOMBS
+let gameOver = false
+let cells
 
-function createMatrix(FIELD_SIZE) {
+function createMatrix(fieldSize) {
   matrix = Array.from(
-    { length: FIELD_SIZE },
-    (el) => (el = Array.from({ length: FIELD_SIZE }, (i) => (i = 0)))
+    { length: fieldSize },
+    (el) => (el = Array.from({ length: fieldSize }, (i) => (i = 0)))
   )
 }
 
-function addBombsToMatrix(FIELD_SIZE) {
-  const NUMBER_OF_BOMBS = Math.round(FIELD_SIZE ** 2 / 4)
+function addBombsToMatrix(fieldSize) {
+  const NUMBER_OF_BOMBS = Math.round(fieldSize ** 2 / 4)
 
   const bombPositionsSet = new Set()
   for (let i = 0; NUMBER_OF_BOMBS > bombPositionsSet.size; i++) {
-    bombPositionsSet.add(giveRandomNumber(FIELD_SIZE ** 2))
+    bombPositionsSet.add(giveRandomNumber(fieldSize ** 2))
   }
   const bombPositionsArr = Array.from(bombPositionsSet).toSorted((a, b) => {
     return a - b
   })
 
-  for (let i = 0; i < FIELD_SIZE; i++) {
-    for (let j = 0; j < FIELD_SIZE; j++) {
-      if (bombPositionsArr.includes(FIELD_SIZE * i + j)) {
+  for (let i = 0; i < fieldSize; i++) {
+    for (let j = 0; j < fieldSize; j++) {
+      if (bombPositionsArr.includes(fieldSize * i + j)) {
         matrix[i][j] = 1
       }
     }
   }
 }
 
-function createGameMatrix(matrix, FIELD_SIZE) {
+function createGameMatrix(matrix, fieldSize) {
   let dx = [-1, 0, 1, -1, 1, -1, 0, 1]
   let dy = [-1, -1, -1, 0, 0, 1, 1, 1]
 
-  let gameMatrix = Array.from({ length: FIELD_SIZE }, () =>
-    Array(FIELD_SIZE).fill(0)
+  let gameMatrix = Array.from({ length: fieldSize }, () =>
+    Array(fieldSize).fill(0)
   )
 
-  for (let i = 0; i < FIELD_SIZE; i++) {
-    for (let j = 0; j < FIELD_SIZE; j++) {
+  for (let i = 0; i < fieldSize; i++) {
+    for (let j = 0; j < fieldSize; j++) {
       if (matrix[i][j] == 1) {
         gameMatrix[i][j] = -1
         continue
@@ -63,9 +65,9 @@ function createGameMatrix(matrix, FIELD_SIZE) {
         let nj = j + dy[k]
         if (
           ni >= 0 &&
-          ni < FIELD_SIZE &&
+          ni < fieldSize &&
           nj >= 0 &&
-          nj < FIELD_SIZE &&
+          nj < fieldSize &&
           matrix[ni][nj] == 1
         ) {
           gameMatrix[i][j]++
@@ -76,9 +78,9 @@ function createGameMatrix(matrix, FIELD_SIZE) {
   return gameMatrix
 }
 
-function initializeVisited(FIELD_SIZE) {
-  let visited = Array.from({ length: FIELD_SIZE }, () =>
-    Array(FIELD_SIZE).fill(false)
+function initializeVisited(fieldSize) {
+  let visited = Array.from({ length: fieldSize }, () =>
+    Array(fieldSize).fill(false)
   )
   return visited
 }
@@ -109,34 +111,26 @@ function openZeros(matrix, x, y, visited) {
   }
 }
 
-function openCell() {}
-
 function giveRandomNumber(endPosition) {
   return Math.floor(Math.random() * endPosition)
 }
 
-function render(FIELD_SIZE) {
-  createMatrix(FIELD_SIZE)
-  addBombsToMatrix(FIELD_SIZE)
+function render(fieldSize) {
+  createMatrix(fieldSize)
+  addBombsToMatrix(fieldSize)
 
-  for (let i = 0; i < FIELD_SIZE ** 2; i++) {
+  for (let i = 0; i < fieldSize ** 2; i++) {
     field.innerHTML += `<div class='cell'></div>`
   }
-  field.style.gridTemplateColumns = `repeat(${FIELD_SIZE}, 1fr)`
+  field.style.gridTemplateColumns = `repeat(${fieldSize}, 1fr)`
 
+  cells = document.querySelectorAll(".cell")
   document.querySelectorAll(".cell").forEach((cell) => {
-    cell.style.width = `calc(1.2*((25vw - (${FIELD_SIZE} + 1)*1vw) / ${FIELD_SIZE}))`
-    cell.style.height = `calc(1.2*((25vw - (${FIELD_SIZE} + 1)*1vw) / ${FIELD_SIZE}))`
+    cell.style.width = `calc(1.2*((25vw - (${fieldSize} + 1)*1vw) / ${fieldSize}))`
+    cell.style.height = `calc(1.2*((25vw - (${fieldSize} + 1)*1vw) / ${fieldSize}))`
   })
 }
 
-render(FIELD_SIZE)
-let visited = initializeVisited(FIELD_SIZE)
-let gameMatrix = createGameMatrix(matrix, FIELD_SIZE)
-console.log(gameMatrix)
-
-const cells = document.querySelectorAll(".cell")
-let gameOver = false
 function leftClick(element, index) {
   if (gameOver) {
     //showLossMessage()
@@ -147,8 +141,8 @@ function leftClick(element, index) {
     return
   }
 
-  let x = Math.floor(index / FIELD_SIZE)
-  let y = index % FIELD_SIZE
+  let x = Math.floor(index / fieldSize)
+  let y = index % fieldSize
   if (gameMatrix[x][y] === 0 && !visited[x][y]) {
     openZeros(gameMatrix, x, y, visited)
   }
@@ -160,31 +154,30 @@ function leftClick(element, index) {
   for (let i = 0; i < visited.length; i++) {
     for (let j = 0; j < visited[i].length; j++) {
       if (visited[i][j] == true) {
-        cells[i * FIELD_SIZE + j].style.backgroundColor = "rgb(82, 80, 80)"
+        cells[i * fieldSize + j].style.backgroundColor = "rgb(82, 80, 80)"
       }
       if (
         gameMatrix[i][j] !== 0 &&
         visited[i][j] == true &&
-        cells[i * FIELD_SIZE + j].innerHTML === ""
+        cells[i * fieldSize + j].innerHTML === ""
       ) {
-        cells[i * FIELD_SIZE + j].innerHTML += `<p>${gameMatrix[i][j]}</p>`
+        cells[i * fieldSize + j].innerHTML += `<p>${gameMatrix[i][j]}</p>`
         colorsOfNum.forEach((color, indexOfColor) => {
           if (gameMatrix[i][j] - 1 == indexOfColor) {
             cells[
-              i * FIELD_SIZE + j
+              i * fieldSize + j
             ].style.color = `${colorsOfNum[indexOfColor]}`
           }
         })
       }
       // blow up segment
       if (gameMatrix[i][j] == -1 && visited[i][j] == true) {
-        for (let l = 0; l < FIELD_SIZE; l++) {
-          for (let k = 0; k < FIELD_SIZE; k++) {
+        for (let l = 0; l < fieldSize; l++) {
+          for (let k = 0; k < fieldSize; k++) {
             if (gameMatrix[l][k] == -1) {
               gameOver = true
-              cells[l * FIELD_SIZE + k].innerHTML = "<p>💣</p>"
-              cells[l * FIELD_SIZE + k].style.backgroundColor =
-                "rgb(82, 80, 80)"
+              cells[l * fieldSize + k].innerHTML = "<p>💣</p>"
+              cells[l * fieldSize + k].style.backgroundColor = "rgb(82, 80, 80)"
             }
           }
         }
@@ -193,14 +186,10 @@ function leftClick(element, index) {
   }
 }
 
-cells.forEach((element, index) => {
-  element.addEventListener("click", () => leftClick(element, index))
-})
-
 function checkWin() {
-  for (let i = 0; i < FIELD_SIZE; i++) {
-    for (let j = 0; j < FIELD_SIZE; j++) {
-      if (gameMatrix[i][j] === -1 && !cells[i * FIELD_SIZE + j].flagVisible) {
+  for (let i = 0; i < fieldSize; i++) {
+    for (let j = 0; j < fieldSize; j++) {
+      if (gameMatrix[i][j] === -1 && !cells[i * fieldSize + j].flagVisible) {
         return false
       }
       if (gameMatrix[i][j] !== -1 && !visited[i][j]) {
@@ -216,7 +205,10 @@ function rightClick(event) {
   if (gameOver) {
     return
   }
-
+  if (checkWin()) {
+    //showWinMessage()
+    return
+  }
   if (!this.flagVisible) {
     if (flagsCount < NUMBER_OF_BOMBS) {
       this.innerHTML = "<p>🚩</p>"
@@ -230,13 +222,23 @@ function rightClick(event) {
     flagsCount--
     console.log(flagsCount)
   }
-  if (checkWin()) {
-    //showWinMessage()
-    return
-  }
 }
 
-cells.forEach((cell) => {
-  cell.flagVisible = false
-  cell.addEventListener("contextmenu", rightClick)
+set.addEventListener("click", () => {
+  fieldSize = +input.value
+  NUMBER_OF_BOMBS = Math.round(fieldSize ** 2 / 4)
+
+  render(fieldSize)
+  visited = initializeVisited(fieldSize)
+  gameMatrix = createGameMatrix(matrix, fieldSize)
+  console.log(gameMatrix)
+
+  cells.forEach((element, index) => {
+    element.addEventListener("click", () => leftClick(element, index))
+  })
+
+  cells.forEach((cell) => {
+    cell.flagVisible = false
+    cell.addEventListener("contextmenu", rightClick)
+  })
 })
