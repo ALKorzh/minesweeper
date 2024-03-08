@@ -1,4 +1,4 @@
-const FIELD_SIZE = 6
+const FIELD_SIZE = 3
 const restart = document.querySelector(".restart-button")
 const start = document.querySelector(".start-button")
 const field = document.querySelector(".field")
@@ -12,7 +12,10 @@ const colorsOfNum = [
   "black",
   "white",
 ]
+
 let matrix = []
+let flagsCount = 0
+const NUMBER_OF_BOMBS = Math.round(FIELD_SIZE ** 2 / 4)
 
 function createMatrix(FIELD_SIZE) {
   matrix = Array.from(
@@ -126,8 +129,8 @@ function render(FIELD_SIZE) {
     cell.style.height = `calc(1.2*((25vw - (${FIELD_SIZE} + 1)*1vw) / ${FIELD_SIZE}))`
   })
 }
-render(FIELD_SIZE)
 
+render(FIELD_SIZE)
 let visited = initializeVisited(FIELD_SIZE)
 let gameMatrix = createGameMatrix(matrix, FIELD_SIZE)
 console.log(gameMatrix)
@@ -136,6 +139,11 @@ const cells = document.querySelectorAll(".cell")
 let gameOver = false
 function leftClick(element, index) {
   if (gameOver) {
+    //showLossMessage()
+    return
+  }
+  if (checkWin()) {
+    //showWinMessage()
     return
   }
 
@@ -146,6 +154,7 @@ function leftClick(element, index) {
   }
   visited[x][y] = true
   console.log(visited)
+  console.log(checkWin())
 
   element.style.backgroundColor = "rgb(82, 80, 80)"
   for (let i = 0; i < visited.length; i++) {
@@ -186,4 +195,48 @@ function leftClick(element, index) {
 
 cells.forEach((element, index) => {
   element.addEventListener("click", () => leftClick(element, index))
+})
+
+function checkWin() {
+  for (let i = 0; i < FIELD_SIZE; i++) {
+    for (let j = 0; j < FIELD_SIZE; j++) {
+      if (gameMatrix[i][j] === -1 && !cells[i * FIELD_SIZE + j].flagVisible) {
+        return false
+      }
+      if (gameMatrix[i][j] !== -1 && !visited[i][j]) {
+        return false
+      }
+    }
+  }
+  return true
+}
+
+function rightClick(event) {
+  event.preventDefault()
+  if (gameOver) {
+    return
+  }
+
+  if (!this.flagVisible) {
+    if (flagsCount < NUMBER_OF_BOMBS) {
+      this.innerHTML = "<p>🚩</p>"
+      this.flagVisible = true
+      flagsCount++
+      console.log(flagsCount)
+    }
+  } else {
+    this.innerHTML = ""
+    this.flagVisible = false
+    flagsCount--
+    console.log(flagsCount)
+  }
+  if (checkWin()) {
+    //showWinMessage()
+    return
+  }
+}
+
+cells.forEach((cell) => {
+  cell.flagVisible = false
+  cell.addEventListener("contextmenu", rightClick)
 })
