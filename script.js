@@ -90,6 +90,8 @@ function openZeros(matrix, x, y, visited) {
     ) {
       if (matrix[nx][ny] === 0) {
         openZeros(matrix, nx, ny, visited)
+      } else if (matrix[nx][ny] > 0) {
+        visited[nx][ny] = true
       }
     }
   }
@@ -120,6 +122,7 @@ render(FIELD_SIZE)
 let visited = initializeVisited(FIELD_SIZE)
 let gameMatrix = createGameMatrix(matrix, FIELD_SIZE)
 console.log(gameMatrix)
+
 const cells = document.querySelectorAll(".cell")
 cells.forEach((element, index) => {
   element.addEventListener("click", () => {
@@ -136,6 +139,23 @@ cells.forEach((element, index) => {
       for (let j = 0; j < visited[i].length; j++) {
         if (visited[i][j] == true) {
           cells[i * FIELD_SIZE + j].style.backgroundColor = "rgb(82, 80, 80)"
+        }
+        if (
+          gameMatrix[i][j] !== 0 &&
+          visited[i][j] == true &&
+          cells[i * FIELD_SIZE + j].innerHTML === ""
+        ) {
+          cells[i * FIELD_SIZE + j].innerHTML += `<p>${gameMatrix[i][j]}</p>`
+        }
+        // blow up segment
+        if (gameMatrix[i][j] == -1 && visited[i][j] == true) {
+          for (let l = 0; l < FIELD_SIZE; l++) {
+            for (let k = 0; k < FIELD_SIZE; k++) {
+              if (gameMatrix[l][k] == -1) {
+                cells[l * FIELD_SIZE + k].innerHTML = "<p>&#128163;</p>"
+              }
+            }
+          }
         }
       }
     }
