@@ -142,7 +142,6 @@ function leftClick(element, index) {
     return
   }
   if (checkWin()) {
-    //showWinMessage()
     return
   }
 
@@ -152,8 +151,6 @@ function leftClick(element, index) {
     openZeros(gameMatrix, x, y, visited)
   }
   visited[x][y] = true
-  console.log(visited)
-  console.log(checkWin())
 
   element.style.backgroundColor = "rgb(82, 80, 80)"
   for (let i = 0; i < visited.length; i++) {
@@ -175,7 +172,6 @@ function leftClick(element, index) {
           }
         })
       }
-      // blow up segment
       if (gameMatrix[i][j] == -1 && visited[i][j] == true) {
         document.body.style.backgroundColor = "red"
         for (let l = 0; l < fieldSize; l++) {
@@ -213,7 +209,6 @@ function rightClick(event) {
     return
   }
   if (checkWin()) {
-    //showWinMessage()
     return
   }
   if (!this.flagVisible) {
@@ -221,13 +216,11 @@ function rightClick(event) {
       this.innerHTML = "<p>🚩</p>"
       this.flagVisible = true
       flagsCount++
-      console.log(flagsCount)
     }
   } else {
     this.innerHTML = ""
     this.flagVisible = false
     flagsCount--
-    console.log(flagsCount)
   }
   updateFlags(flagsCount, numberOfBombs)
 }
@@ -239,7 +232,6 @@ function start() {
   render(fieldSize)
   visited = initializeVisited(fieldSize)
   gameMatrix = createGameMatrix(matrix, fieldSize)
-  console.log(gameMatrix)
 
   cells.forEach((element, index) => {
     element.addEventListener("click", () => leftClick(element, index))
