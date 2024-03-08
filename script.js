@@ -2,7 +2,16 @@ const FIELD_SIZE = 6
 const restart = document.querySelector(".restart-button")
 const start = document.querySelector(".start-button")
 const field = document.querySelector(".field")
-
+const colorsOfNum = [
+  "blue",
+  "green",
+  "red",
+  "rgb(10, 31, 154)",
+  "brown",
+  "rgb(48,213,200)",
+  "black",
+  "white",
+]
 let matrix = []
 
 function createMatrix(FIELD_SIZE) {
@@ -146,6 +155,13 @@ cells.forEach((element, index) => {
           cells[i * FIELD_SIZE + j].innerHTML === ""
         ) {
           cells[i * FIELD_SIZE + j].innerHTML += `<p>${gameMatrix[i][j]}</p>`
+          colorsOfNum.forEach((color, indexOfColor) => {
+            if (gameMatrix[i][j] - 1 == indexOfColor) {
+              cells[
+                i * FIELD_SIZE + j
+              ].style.color = `${colorsOfNum[indexOfColor]}`
+            }
+          })
         }
         // blow up segment
         if (gameMatrix[i][j] == -1 && visited[i][j] == true) {
