@@ -133,49 +133,57 @@ let gameMatrix = createGameMatrix(matrix, FIELD_SIZE)
 console.log(gameMatrix)
 
 const cells = document.querySelectorAll(".cell")
-cells.forEach((element, index) => {
-  element.addEventListener("click", () => {
-    let x = Math.floor(index / FIELD_SIZE)
-    let y = index % FIELD_SIZE
-    if (gameMatrix[x][y] === 0 && !visited[x][y]) {
-      openZeros(gameMatrix, x, y, visited)
-    }
-    visited[x][y] = true
-    console.log(visited)
+let gameOver = false
+function leftClick(element, index) {
+  if (gameOver) {
+    return
+  }
 
-    element.style.backgroundColor = "rgb(82, 80, 80)"
-    for (let i = 0; i < visited.length; i++) {
-      for (let j = 0; j < visited[i].length; j++) {
-        if (visited[i][j] == true) {
-          cells[i * FIELD_SIZE + j].style.backgroundColor = "rgb(82, 80, 80)"
-        }
-        if (
-          gameMatrix[i][j] !== 0 &&
-          visited[i][j] == true &&
-          cells[i * FIELD_SIZE + j].innerHTML === ""
-        ) {
-          cells[i * FIELD_SIZE + j].innerHTML += `<p>${gameMatrix[i][j]}</p>`
-          colorsOfNum.forEach((color, indexOfColor) => {
-            if (gameMatrix[i][j] - 1 == indexOfColor) {
-              cells[
-                i * FIELD_SIZE + j
-              ].style.color = `${colorsOfNum[indexOfColor]}`
-            }
-          })
-        }
-        // blow up segment
-        if (gameMatrix[i][j] == -1 && visited[i][j] == true) {
-          for (let l = 0; l < FIELD_SIZE; l++) {
-            for (let k = 0; k < FIELD_SIZE; k++) {
-              if (gameMatrix[l][k] == -1) {
-                cells[l * FIELD_SIZE + k].innerHTML = "<p>&#128163;</p>"
-                cells[l * FIELD_SIZE + k].style.backgroundColor =
-                  "rgb(82, 80, 80)"
-              }
+  let x = Math.floor(index / FIELD_SIZE)
+  let y = index % FIELD_SIZE
+  if (gameMatrix[x][y] === 0 && !visited[x][y]) {
+    openZeros(gameMatrix, x, y, visited)
+  }
+  visited[x][y] = true
+  console.log(visited)
+
+  element.style.backgroundColor = "rgb(82, 80, 80)"
+  for (let i = 0; i < visited.length; i++) {
+    for (let j = 0; j < visited[i].length; j++) {
+      if (visited[i][j] == true) {
+        cells[i * FIELD_SIZE + j].style.backgroundColor = "rgb(82, 80, 80)"
+      }
+      if (
+        gameMatrix[i][j] !== 0 &&
+        visited[i][j] == true &&
+        cells[i * FIELD_SIZE + j].innerHTML === ""
+      ) {
+        cells[i * FIELD_SIZE + j].innerHTML += `<p>${gameMatrix[i][j]}</p>`
+        colorsOfNum.forEach((color, indexOfColor) => {
+          if (gameMatrix[i][j] - 1 == indexOfColor) {
+            cells[
+              i * FIELD_SIZE + j
+            ].style.color = `${colorsOfNum[indexOfColor]}`
+          }
+        })
+      }
+      // blow up segment
+      if (gameMatrix[i][j] == -1 && visited[i][j] == true) {
+        for (let l = 0; l < FIELD_SIZE; l++) {
+          for (let k = 0; k < FIELD_SIZE; k++) {
+            if (gameMatrix[l][k] == -1) {
+              gameOver = true
+              cells[l * FIELD_SIZE + k].innerHTML = "<p>💣</p>"
+              cells[l * FIELD_SIZE + k].style.backgroundColor =
+                "rgb(82, 80, 80)"
             }
           }
         }
       }
     }
-  })
+  }
+}
+
+cells.forEach((element, index) => {
+  element.addEventListener("click", () => leftClick(element, index))
 })
