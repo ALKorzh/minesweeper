@@ -139,7 +139,6 @@ function render(fieldSize) {
 
 function leftClick(element, index) {
   if (gameOver) {
-    body.style.backgroundColor = "red"
     return
   }
   if (checkWin()) {
@@ -178,6 +177,7 @@ function leftClick(element, index) {
       }
       // blow up segment
       if (gameMatrix[i][j] == -1 && visited[i][j] == true) {
+        document.body.style.backgroundColor = "red"
         for (let l = 0; l < fieldSize; l++) {
           for (let k = 0; k < fieldSize; k++) {
             if (gameMatrix[l][k] == -1) {
@@ -203,6 +203,7 @@ function checkWin() {
       }
     }
   }
+  document.body.style.backgroundColor = "green"
   return true
 }
 
