@@ -1,6 +1,7 @@
 const set = document.querySelector(".set-field-button")
 const field = document.querySelector(".field")
 const input = document.querySelector(".input-size")
+const flagDiv = document.querySelector(".flag")
 const colorsOfNum = [
   "blue",
   "green",
@@ -13,9 +14,9 @@ const colorsOfNum = [
 ]
 
 let matrix = []
-let flagsCount = 0
 let fieldSize
-let NUMBER_OF_BOMBS
+let numberOfBombs
+let flagsCount = 0
 let gameOver = false
 let cells
 
@@ -27,10 +28,10 @@ function createMatrix(fieldSize) {
 }
 
 function addBombsToMatrix(fieldSize) {
-  const NUMBER_OF_BOMBS = Math.round(fieldSize ** 2 / 4)
+  const numberOfBombs = Math.round(fieldSize ** 2 / 4)
 
   const bombPositionsSet = new Set()
-  for (let i = 0; NUMBER_OF_BOMBS > bombPositionsSet.size; i++) {
+  for (let i = 0; numberOfBombs > bombPositionsSet.size; i++) {
     bombPositionsSet.add(giveRandomNumber(fieldSize ** 2))
   }
   const bombPositionsArr = Array.from(bombPositionsSet).toSorted((a, b) => {
@@ -114,8 +115,13 @@ function openZeros(matrix, x, y, visited) {
 function giveRandomNumber(endPosition) {
   return Math.floor(Math.random() * endPosition)
 }
-
+function updateFlags(flagsCount, numberOfBombs) {
+  flagDiv.innerHTML = `🚩 ${numberOfBombs - flagsCount}`
+}
 function render(fieldSize) {
+  flagDiv.innerHTML = `🚩 ${numberOfBombs - flagsCount}`
+
+  field.innerHTML = ""
   createMatrix(fieldSize)
   addBombsToMatrix(fieldSize)
 
@@ -133,7 +139,7 @@ function render(fieldSize) {
 
 function leftClick(element, index) {
   if (gameOver) {
-    //showLossMessage()
+    body.style.backgroundColor = "red"
     return
   }
   if (checkWin()) {
@@ -210,7 +216,7 @@ function rightClick(event) {
     return
   }
   if (!this.flagVisible) {
-    if (flagsCount < NUMBER_OF_BOMBS) {
+    if (flagsCount < numberOfBombs) {
       this.innerHTML = "<p>🚩</p>"
       this.flagVisible = true
       flagsCount++
@@ -222,11 +228,12 @@ function rightClick(event) {
     flagsCount--
     console.log(flagsCount)
   }
+  updateFlags(flagsCount, numberOfBombs)
 }
 
-set.addEventListener("click", () => {
+function start() {
   fieldSize = +input.value
-  NUMBER_OF_BOMBS = Math.round(fieldSize ** 2 / 4)
+  numberOfBombs = Math.round(fieldSize ** 2 / 4)
 
   render(fieldSize)
   visited = initializeVisited(fieldSize)
@@ -241,4 +248,9 @@ set.addEventListener("click", () => {
     cell.flagVisible = false
     cell.addEventListener("contextmenu", rightClick)
   })
-})
+  input.disabled = true
+  set.disabled = true
+
+  set.removeEventListener("click", start)
+}
+set.addEventListener("click", start)

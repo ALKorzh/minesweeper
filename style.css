@@ -1,3 +1,7 @@
+body {
+  margin: 0;
+  background-color: rgb(201, 200, 200);
+}
 .cell {
   display: flex;
   justify-content: center;
@@ -10,10 +14,6 @@
 .field {
   display: grid;
   gap: 5px;
-  width: 25vw;
-  height: 25vh;
-  max-width: 25vw;
-  max-height: 25vh;
 }
 .set-field-button {
   display: flex;
@@ -24,4 +24,22 @@
   min-width: 50px;
   min-height: 25px;
   background-color: rgb(93, 92, 92);
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1%;
+}
+.input-1 {
+  display: flex;
+  gap: 1%;
+  margin: 2%;
+}
+.flag {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1%;
 }
